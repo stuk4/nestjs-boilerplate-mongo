@@ -21,9 +21,7 @@ import { JoiValidationSchema } from './config/joi.validation';
   providers: [AppService],
 })
 export class AppModule implements NestModule {
-  constructor() {
-    console.log(process.env);
-  }
+  constructor() {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LogginMiddleware).forRoutes('*');
