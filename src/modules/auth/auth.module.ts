@@ -5,6 +5,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+  RefreshToken,
+  RefreshTokenSchema,
+} from './schemas/refresh-token.schema';
 
 @Module({
   imports: [
@@ -12,6 +16,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       {
         name: User.name,
         schema: UserSchema,
+      },
+      {
+        name: RefreshToken.name,
+        schema: RefreshTokenSchema,
       },
     ]),
     JwtModule.registerAsync({

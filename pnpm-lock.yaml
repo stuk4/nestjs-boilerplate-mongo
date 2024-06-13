@@ -37,6 +37,7 @@ specifiers:
   ts-node: ^10.9.1
   tsconfig-paths: ^4.2.0
   typescript: ^5.1.3
+  uuid: ^10.0.0
 
 dependencies:
   '@nestjs/common': 10.3.9_bnnxhceqlvpgrjxe5cy4yeabo4
@@ -53,6 +54,7 @@ dependencies:
   mongoose: 8.4.1
   reflect-metadata: 0.2.2
   rxjs: 7.8.1
+  uuid: 10.0.0
 
 devDependencies:
   '@nestjs/cli': 10.3.2
@@ -5452,6 +5454,11 @@ packages:
   /utils-merge/1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
+
+  /uuid/10.0.0:
+    resolution: {integrity: sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==}
+    hasBin: true
+    dev: false
 
   /uuid/9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
