@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { SignupDto } from './dtos/signup.dto';
 import * as bcrypt from 'bcrypt';
@@ -71,7 +71,9 @@ export class AuthService {
         throw new UnauthorizedException('Invalid credentials');
       }
       this.logger.log(`User ${user._id} logged in`);
-      const tokens = await this.generateUserToken(user._id as string);
+      const tokens = await this.generateUserToken(
+        user._id as mongoose.Types.ObjectId,
+      );
       return {
         user: {
           email: user.email,
@@ -90,14 +92,17 @@ export class AuthService {
   }
   async refreshToken(refreshToken: string) {
     try {
-      const token = await this.refreshTokenModel.findOneAndDelete({
-        token: refreshToken,
+      const tokenDoc = await this.refreshTokenModel.findOne({
         expiresAt: { $gt: new Date() },
       });
-      if (!token) {
+      if (!tokenDoc) {
         throw new UnauthorizedException('Invalid refresh token');
       }
-      return this.generateUserToken(token.userId.toString());
+      const tokenMatch = await bcrypt.compare(refreshToken, tokenDoc.token);
+      if (!tokenMatch) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+      return this.generateUserToken(tokenDoc.userId);
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
@@ -107,7 +112,7 @@ export class AuthService {
     }
   }
 
-  private async generateUserToken(userId: string) {
+  private async generateUserToken(userId: mongoose.Types.ObjectId) {
     const accessToken = this.jwtService.sign({ userId });
     const refreshToken = uuidv4();
     await this.storeRefreshToken(refreshToken, userId);
@@ -117,10 +122,28 @@ export class AuthService {
     };
   }
 
-  private async storeRefreshToken(token: string, userId: string) {
+  private async storeRefreshToken(
+    token: string,
+    userId: mongoose.Types.ObjectId,
+  ) {
     const expireAt = new Date();
-    // Set the expiration date to 3 days from now
+
     expireAt.setDate(expireAt.getDate() + 3);
-    await this.refreshTokenModel.create({ token, userId, expiresAt: expireAt });
+    const hashedToken = await bcrypt.hash(token, 10);
+
+    await this.refreshTokenModel.updateOne(
+      {
+        userId,
+      },
+      {
+        $set: {
+          token: hashedToken,
+          expiresAt: expireAt,
+        },
+      },
+      {
+        upsert: true,
+      },
+    );
   }
 }
