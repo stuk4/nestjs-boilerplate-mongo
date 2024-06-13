@@ -9,4 +9,6 @@ export const JoiValidationSchema = Joi.object({
   MONGODB_URI: Joi.string().required(),
   MONGODB_NAME: Joi.string().required(),
   PORT: Joi.number().default(3000),
+  JWT_SECRET: Joi.string().required(),
+  JWT_EXPIRES_IN: Joi.string().required(),
 });
