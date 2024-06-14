@@ -90,6 +90,7 @@ export class AuthService {
       }
     }
   }
+  // TODO: recibir userId mediante el access_token
   async refreshToken(refreshToken: string) {
     try {
       const tokenDoc = await this.refreshTokenModel.findOne({
