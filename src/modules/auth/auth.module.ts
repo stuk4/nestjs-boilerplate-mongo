@@ -10,8 +10,11 @@ import {
   RefreshTokenSchema,
 } from './schemas/refresh-token.schema';
 import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy],
   imports: [
     MongooseModule.forFeature([
       {
@@ -37,8 +40,7 @@ import { PassportModule } from '@nestjs/passport';
       },
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService],
-  exports: [JwtModule],
+
+  exports: [MongooseModule, JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}
