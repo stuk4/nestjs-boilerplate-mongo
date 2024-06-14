@@ -3,6 +3,10 @@ import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './modules/auth/decorators/get-user.decorator';
 import { UserDocument } from './modules/auth/schemas/user.schema';
+import { UserRoleGuard } from './modules/auth/guards/user-role.guard';
+import { EnumRole } from './modules/auth/interfaces/auth.interfaces';
+import { RoleProtected } from './modules/auth/decorators/role-protected.decorator';
+import { Auth } from './modules/auth/decorators';
 
 @Controller()
 export class AppController {
@@ -17,8 +21,17 @@ export class AppController {
     };
   }
   @Get('private2')
-  @UseGuards(AuthGuard())
+  @RoleProtected(EnumRole.admin, EnumRole.user)
+  @UseGuards(AuthGuard(), UserRoleGuard)
   testingPrivate2Route(@GetUser() user: UserDocument) {
+    return {
+      ok: true,
+      user,
+    };
+  }
+  @Get('private3')
+  @Auth(EnumRole.admin)
+  testingPrivate3Route(@GetUser() user: UserDocument) {
     return {
       ok: true,
       user,
