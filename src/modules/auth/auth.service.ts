@@ -90,10 +90,11 @@ export class AuthService {
       }
     }
   }
-  // TODO: recibir userId mediante el access_token
-  async refreshToken(refreshToken: string) {
+
+  async refreshToken(refreshToken: string, userId: string) {
     try {
       const tokenDoc = await this.refreshTokenModel.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
         expiresAt: { $gt: new Date() },
       });
       if (!tokenDoc) {
