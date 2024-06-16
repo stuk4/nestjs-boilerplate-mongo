@@ -28,11 +28,10 @@ export class OauthService {
   ) {}
 
   async googleLogin(req: any, res: any) {
-    this.logger.debug('Google login', JSON.stringify(req.user));
     if (!req.user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    this.logger.debug(`User ${req.user.email} logged in`);
+
     try {
       let user = await this.userModel.findOne({ email: req.user.email });
       if (!user) {
@@ -46,7 +45,7 @@ export class OauthService {
           password: hashedPassword,
         });
         await user.save();
-        this.logger.debug(`New user created: ${user._id}`);
+        this.logger.log(`New user created: ${user._id}`);
       }
 
       const authorizationCode = await this.generateAuthorizationCode(
@@ -79,12 +78,6 @@ export class OauthService {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 10); // Código válido por 10 minutos
     try {
-      // await this.authorizationCodeModel.deleteMany({ userId });
-      // await this.authorizationCodeModel.create({
-      //   code,
-      //   userId,
-      //   expiresAt,
-      // });
       await this.authorizationCodeModel.updateOne(
         { userId },
         { $set: { code, userId, expiresAt } },
