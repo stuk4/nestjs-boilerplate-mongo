@@ -16,6 +16,8 @@ import {
 } from './schemas/authorization-code.schema';
 import { ExchangeCodeDto } from './dtos/exchange-code.dto';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
+import { AuthenticatedGoogleRequest } from './interfaces';
 
 @Injectable()
 export class OauthService {
@@ -27,7 +29,7 @@ export class OauthService {
     private readonly authService: AuthService,
   ) {}
 
-  async googleLogin(req: any, res: any) {
+  async googleLogin(req: AuthenticatedGoogleRequest, res: Response) {
     if (!req.user) {
       throw new UnauthorizedException('Invalid credentials');
     }
