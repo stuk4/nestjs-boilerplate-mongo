@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './schemas/user.schema';
+
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
@@ -18,16 +18,14 @@ import {
 } from './schemas/authorization-code.schema';
 import { OauthService } from './oauth.service';
 import { OauthController } from './oauth.controller';
+import { UserModule } from '../user/user.module';
 
 @Module({
   controllers: [AuthController, OauthController],
   providers: [AuthService, JwtStrategy, GoogleStrategy, OauthService],
   imports: [
+    UserModule,
     MongooseModule.forFeature([
-      {
-        name: User.name,
-        schema: UserSchema,
-      },
       {
         name: RefreshToken.name,
         schema: RefreshTokenSchema,
@@ -37,6 +35,7 @@ import { OauthController } from './oauth.controller';
         schema: AuthorizationCodeSchema,
       },
     ]),
+
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

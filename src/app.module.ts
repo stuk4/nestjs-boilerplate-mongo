@@ -7,6 +7,7 @@ import { LogginMiddleware } from 'src/middlewares';
 import { EnvConfiguration } from './config';
 import { JoiValidationSchema } from './config/joi.validation';
 import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthModule } from './modules/auth/auth.module';
       }),
     }),
     AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -12,14 +12,16 @@ import { SignupDto } from './dtos/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dtos/login.dto';
 import { RefreshToken } from './schemas/refresh-token.schema';
-import { User, UserDocument } from './schemas/user.schema';
+import { User, UserDocument } from '../user/schemas/user.schema';
 import { v4 as uuidv4 } from 'uuid';
+import { Profile, ProfileDocument } from '../user/schemas/profile.schema';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Profile.name) private profileModel: Model<ProfileDocument>,
 
     @InjectModel(RefreshToken.name)
     private refreshTokenModel: Model<RefreshToken>,
@@ -28,6 +30,8 @@ export class AuthService {
 
   async signUp(signupDto: SignupDto) {
     const { email, password, username, fullName } = signupDto;
+    const session = await this.userModel.db.startSession();
+    session.startTransaction();
     try {
       // Check if email is in use
       const emailInUse = await this.userModel.exists({
@@ -39,25 +43,47 @@ export class AuthService {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      // get ip address
 
-      const createdUser = await this.userModel.create({
-        email,
-        password: hashedPassword,
-        username,
-        fullName,
-        ipAddresses: '',
-      });
+      const createdProfile = await this.profileModel.create(
+        [
+          {
+            username,
+            bio: '',
+            gender: null,
+            inactiveReason: '',
+            avatarUrl: '',
+          },
+        ],
+        { session },
+      );
+
+      const createdUser = await this.userModel.create(
+        [
+          {
+            email,
+            password: hashedPassword,
+            username,
+            fullName,
+            ipAddresses: [],
+            profile: createdProfile[0]._id,
+          },
+        ],
+        { session },
+      );
+      await session.commitTransaction();
+      session.endSession();
 
       return {
-        email: createdUser.email,
-        username: createdUser.username,
+        email: createdUser[0].email,
+        username: createdUser[0].username,
       };
     } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
       if (error instanceof ConflictException) {
         throw error;
       } else {
-        this.logger.error(error.message);
+        this.logger.error(`ERROR CREATING USER ${error.message}`);
         throw new InternalServerErrorException('Error signing up');
       }
     }

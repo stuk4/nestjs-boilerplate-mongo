@@ -19,6 +19,13 @@ npm i -g @nestjs/cli
 
 4. Start the database
 
+Create mongodb_keyfile (replicas)
+
+```
+openssl rand -base64 756 > mongodb_keyfile
+chmod 400 mongodb_keyfile
+```
+
 ```
 docker-compose up -d
 ```
