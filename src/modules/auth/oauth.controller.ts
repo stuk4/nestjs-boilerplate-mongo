@@ -10,6 +10,8 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { OauthService } from './oauth.service';
 import { ExchangeCodeDto } from './dtos/exchange-code.dto';
+import { Response } from 'express';
+import { AuthenticatedGoogleRequest } from './interfaces';
 
 @Controller('oauth')
 export class OauthController {
@@ -20,7 +22,10 @@ export class OauthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req, @Res() res) {
+  googleAuthRedirect(
+    @Req() req: AuthenticatedGoogleRequest,
+    @Res() res: Response,
+  ) {
     return this.oAuthService.googleLogin(req, res);
   }
   @Post('exchange-code')
