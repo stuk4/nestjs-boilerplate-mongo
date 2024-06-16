@@ -89,14 +89,21 @@ export class AuthService {
     }
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, ip: string) {
     const { email, password } = loginDto;
+    this.logger.log(`User ${email} logging in from ${ip}`);
     try {
       const user = await this.userModel.findOne({ email });
 
       if (!user) {
         throw new UnauthorizedException('Invalid credentials');
       }
+      if (user.ipAddresses.length === 10) {
+        user.ipAddresses.shift();
+      }
+
+      user.ipAddresses.push(ip);
+      await user.save();
 
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
