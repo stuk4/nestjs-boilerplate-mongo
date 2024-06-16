@@ -11,10 +11,17 @@ import {
 } from './schemas/refresh-token.schema';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
+import {
+  AuthorizationCode,
+  AuthorizationCodeSchema,
+} from './schemas/authorization-code.schema';
+import { OauthService } from './oauth.service';
+import { OauthController } from './oauth.controller';
 
 @Module({
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  controllers: [AuthController, OauthController],
+  providers: [AuthService, JwtStrategy, GoogleStrategy, OauthService],
   imports: [
     MongooseModule.forFeature([
       {
@@ -24,6 +31,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       {
         name: RefreshToken.name,
         schema: RefreshTokenSchema,
+      },
+      {
+        name: AuthorizationCode.name,
+        schema: AuthorizationCodeSchema,
       },
     ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),

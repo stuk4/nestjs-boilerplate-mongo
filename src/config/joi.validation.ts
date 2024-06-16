@@ -11,4 +11,6 @@ export const JoiValidationSchema = Joi.object({
   PORT: Joi.number().default(3000),
   JWT_SECRET: Joi.string().required(),
   JWT_EXPIRES_IN: Joi.string().required(),
+  GOOGLE_CLIENT_ID: Joi.string().required(),
+  GOOGLE_SECRET: Joi.string().required(),
 });

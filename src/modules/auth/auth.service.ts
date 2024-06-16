@@ -14,18 +14,20 @@ import { LoginDto } from './dtos/login.dto';
 import { RefreshToken } from './schemas/refresh-token.schema';
 import { User, UserDocument } from './schemas/user.schema';
 import { v4 as uuidv4 } from 'uuid';
+
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+
     @InjectModel(RefreshToken.name)
     private refreshTokenModel: Model<RefreshToken>,
     private jwtService: JwtService,
   ) {}
 
   async signUp(signupDto: SignupDto) {
-    const { email, password, name } = signupDto;
+    const { email, password, username, fullName } = signupDto;
     try {
       // Check if email is in use
       const emailInUse = await this.userModel.exists({
@@ -37,15 +39,19 @@ export class AuthService {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
+      // get ip address
+
       const createdUser = await this.userModel.create({
         email,
         password: hashedPassword,
-        name,
+        username,
+        fullName,
+        ipAddresses: '',
       });
 
       return {
         email: createdUser.email,
-        name: createdUser.name,
+        username: createdUser.username,
       };
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -77,7 +83,7 @@ export class AuthService {
       return {
         user: {
           email: user.email,
-          name: user.name,
+          username: user.username,
         },
         ...tokens,
       };
@@ -114,7 +120,7 @@ export class AuthService {
     }
   }
 
-  private async generateUserToken(userId: mongoose.Types.ObjectId) {
+  async generateUserToken(userId: mongoose.Types.ObjectId) {
     const accessToken = this.jwtService.sign({ userId });
     const refreshToken = uuidv4();
     await this.storeRefreshToken(refreshToken, userId);

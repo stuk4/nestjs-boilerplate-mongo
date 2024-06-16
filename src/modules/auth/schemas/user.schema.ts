@@ -8,11 +8,17 @@ export type UserDocument = HydratedDocument<User>;
   timestamps: true,
 })
 export class User extends Document {
-  @Prop({ required: true, index: true })
-  name: string;
-
   @Prop({ required: true, unique: true, index: true })
   email: string;
+
+  @Prop({ required: true })
+  username: string;
+
+  @Prop({ required: true })
+  fullName: string;
+
+  @Prop()
+  ipAddresses: string;
 
   @Prop({ required: true })
   password: string;
