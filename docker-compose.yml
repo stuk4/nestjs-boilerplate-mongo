@@ -8,8 +8,23 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
-
+    command:
+      [
+        'mongod',
+        '--replSet',
+        'rs0',
+        '--bind_ip_all',
+        '--keyFile',
+        '/etc/mongo-keyfile/mongodb_keyfile',
+      ]
     volumes:
       - ./mongodb_boilerplate:/data/db
+      - ./mongodb_keyfile:/etc/mongo-keyfile/mongodb_keyfile
+    healthcheck:
+      test: test $$(echo 'db.isMaster().setName' | mongosh --quiet) == rs0 || exit 1
+      interval: 5s
+      timeout: 30s
+      retries: 30
+
 volumes:
   mongodb_boilerplate:
