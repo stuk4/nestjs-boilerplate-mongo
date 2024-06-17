@@ -3,11 +3,15 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LogginMiddleware } from 'src/middlewares';
-import { EnvConfiguration } from './config';
-import { JoiValidationSchema } from './config/joi.validation';
-import { AuthModule } from './modules/auth/auth.module';
-import { UserModule } from './modules/user/user.module';
+
+import { CommonModule } from './common/common.module';
+import { EnvConfiguration } from './common/config';
+import { JoiValidationSchema } from './common/config/joi.validation';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { LogginMiddleware } from './common/middlewares';
+import { CentralBankModule } from './central-bank/central-bank.module';
+import { IpcService } from './central-bank/ipc.service';
 
 @Module({
   imports: [
@@ -28,9 +32,11 @@ import { UserModule } from './modules/user/user.module';
     }),
     AuthModule,
     UserModule,
+    CommonModule,
+    CentralBankModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, IpcService],
 })
 export class AppModule implements NestModule {
   constructor() {}

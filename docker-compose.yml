@@ -4,27 +4,30 @@ services:
     image: mongo:7.0
     restart: unless-stopped
     ports:
-      - 27017:27017
+      - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
-    command:
-      [
-        'mongod',
-        '--replSet',
-        'rs0',
-        '--bind_ip_all',
-        '--keyFile',
-        '/etc/mongo-keyfile/mongodb_keyfile',
+    command: [
+        'bash',
+        '-c',
+        "mongod --replSet rs0 --bind_ip_all --keyFile /etc/mongo-keyfile/mongodb_keyfile & \
+        sleep 5 && \
+        mongosh --username root --password rootpassword --authenticationDatabase admin --eval 'if (!rs.status().ok) { rs.initiate({_id: \"rs0\", members: [{ _id: 0, host: \"mongodb_boilerplate:27017\" }]}) }' && \
+        tail -f /dev/null",
       ]
     volumes:
       - ./mongodb_boilerplate:/data/db
       - ./mongodb_keyfile:/etc/mongo-keyfile/mongodb_keyfile
     healthcheck:
-      test: test $$(echo 'db.isMaster().setName' | mongosh --quiet) == rs0 || exit 1
-      interval: 5s
+      test:
+        [
+          'CMD-SHELL',
+          "mongosh --username root --password rootpassword --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'",
+        ]
+      interval: 10s
       timeout: 30s
-      retries: 30
+      retries: 3
 
 volumes:
   mongodb_boilerplate:

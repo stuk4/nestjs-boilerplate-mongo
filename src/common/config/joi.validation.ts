@@ -13,4 +13,7 @@ export const JoiValidationSchema = Joi.object({
   JWT_EXPIRES_IN: Joi.string().required(),
   GOOGLE_CLIENT_ID: Joi.string().required(),
   GOOGLE_SECRET: Joi.string().required(),
+  BCENTRAL_USER: Joi.string().required(),
+  BCENTRAL_PASS: Joi.string().required(),
+  BCENTRAL_URL: Joi.string().required(),
 });

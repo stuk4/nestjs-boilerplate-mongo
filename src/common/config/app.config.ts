@@ -6,4 +6,7 @@ export const EnvConfiguration = () => ({
   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleSecret: process.env.GOOGLE_SECRET,
+  bcentralUser: process.env.BCENTRAL_USER,
+  bcentralPass: process.env.BCENTRAL_PASS,
+  bcentralUrl: process.env.BCENTRAL_URL,
 });
